@@ -1,0 +1,11 @@
+target
+*.jar
+*.war
+*.ear
+.git
+.gitignore
+Dockerfile
+compose.yml
+docker-compose.yml
+.idea
+*.iml

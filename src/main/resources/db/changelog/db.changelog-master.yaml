@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: init
+      author: system
+      changes:
+        - sql: "SELECT 1"

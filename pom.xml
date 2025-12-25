@@ -8,7 +8,7 @@
 		<version>4.0.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.lucas.damasceno.dev.gmail.com</groupId>
+	<groupId>com.lucasdamasceno.com</groupId>
 	<artifactId>smart-budget-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Smart Budget App</name>
