@@ -1,0 +1,36 @@
+/* Tailwind CSS 4.2 - CSS-First Configuration */
+@theme {
+  --color-budget-green: #10b981;
+  --color-budget-red: #ef4444;
+  --color-budget-gold: #f59e0b;
+  --color-mist-50: #f8fafc;
+  --color-mist-100: #f1f5f9;
+  --color-mist-200: #e2e8f0;
+  --color-mist-300: #cbd5e1;
+  --color-mist-400: #94a3b8;
+  --color-mist-500: #64748b;
+  --color-mist-600: #475569;
+  --color-mist-700: #334155;
+  --color-mist-800: #1e293b;
+  --color-mist-900: #0f172a;
+}
+
+/* CSS Layers - primeNG must come BEFORE tailwind-utilities */
+@layer theme, base, primeng, tailwind-utilities;
+
+/* Tailwind CSS imports */
+@import "tailwindcss";
+
+/* Primeicons */
+@import "primeicons/primeicons.css";
+
+/* PrimeNG Tailwind Plugin */
+/* @import "tailwindcss-primeui"; */
+
+/* Global styles */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background-color: var(--color-mist-50);
+  color: var(--color-mist-900);
+}
