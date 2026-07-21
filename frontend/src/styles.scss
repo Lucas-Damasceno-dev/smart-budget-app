@@ -1,0 +1,280 @@
+// Custom Theme for FinanceFlow
+@use '@angular/material' as mat;
+
+// Define custom palettes
+$primary-palette: (
+  50: #e8f0fe,
+  100: #c5d9fc,
+  200: #9ebffa,
+  300: #77a5f7,
+  400: #5992f5,
+  500: #2563eb,
+  600: #2159d8,
+  700: #1c4dc2,
+  800: #1841ad,
+  900: #102d85,
+  A100: #c5d9fc,
+  A200: #77a5f7,
+  A400: #2563eb,
+  A700: #1c4dc2,
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: rgba(0, 0, 0, 0.87),
+    300: rgba(0, 0, 0, 0.87),
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(0, 0, 0, 0.87),
+    A200: rgba(0, 0, 0, 0.87),
+    A400: white,
+    A700: white,
+  )
+);
+
+$accent-palette: (
+  50: #e0f5f0,
+  100: #b3e5d9,
+  200: #80d4c0,
+  300: #4dc2a7,
+  400: #26b594,
+  500: #059669,
+  600: #048e61,
+  700: #038356,
+  800: #02794c,
+  900: #01683b,
+  A100: #b3e5d9,
+  A200: #4dc2a7,
+  A400: #059669,
+  A700: #038356,
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: rgba(0, 0, 0, 0.87),
+    300: rgba(0, 0, 0, 0.87),
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(0, 0, 0, 0.87),
+    A200: rgba(0, 0, 0, 0.87),
+    A400: white,
+    A700: white,
+  )
+);
+
+@include mat.core();
+
+$financeflow-primary: mat.m2-define-palette($primary-palette);
+$financeflow-accent: mat.m2-define-palette($accent-palette);
+$financeflow-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$financeflow-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $financeflow-primary,
+    accent: $financeflow-accent,
+    warn: $financeflow-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Inter, sans-serif',
+  ),
+  density: 0,
+));
+
+$financeflow-dark-theme: mat.m2-define-dark-theme((
+  color: (
+    primary: $financeflow-primary,
+    accent: $financeflow-accent,
+    warn: $financeflow-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Inter, sans-serif',
+  ),
+  density: 0,
+));
+
+@include mat.all-component-themes($financeflow-theme);
+
+.dark-theme {
+  @include mat.all-component-colors($financeflow-dark-theme);
+}
+
+// Global styles
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f5f5f5;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.dark-theme body {
+  background-color: #121212;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+// Utility classes
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+  
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1f2937;
+  }
+}
+
+.dark-theme .page-header h1 {
+  color: #f9fafb;
+}
+
+// Card styles
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .card {
+  background: #1e1e1e;
+}
+
+// Button styles
+.btn-primary {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+.btn-success {
+  background-color: #059669 !important;
+  color: white !important;
+}
+
+.btn-danger {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+
+// Amount colors
+.amount-income {
+  color: #059669;
+}
+
+.amount-expense {
+  color: #dc2626;
+}
+
+.amount-transfer {
+  color: #2563eb;
+}
+
+// Responsive breakpoints
+// xs: 360px
+// sm: 600px
+// md: 960px
+// lg: 1280px
+
+@media (max-width: 599px) {
+  .hide-xs {
+    display: none !important;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .hide-sm {
+    display: none !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .hide-md-up {
+    display: none !important;
+  }
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.dark-theme {
+  ::-webkit-scrollbar-track {
+    background: #2d2d2d;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #555;
+  }
+}
+
+// Loading skeleton
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.dark-theme .skeleton {
+  background: linear-gradient(90deg, #2d2d2d 25%, #3d3d3d 50%, #2d2d2d 75%);
+  background-size: 200% 100%;
+}
+
+// Snackbar customization
+.snackbar-success {
+  --mdc-snackbar-container-color: #059669;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+.snackbar-error {
+  --mdc-snackbar-container-color: #dc2626;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+.snackbar-warning {
+  --mdc-snackbar-container-color: #f59e0b;
+  --mdc-snackbar-supporting-text-color: white;
+}
