@@ -12,6 +12,7 @@ import java.util.UUID;
 @Repository
 public interface InvestmentRepository extends JpaRepository<Investment, UUID> {
 
+    @Query("SELECT i FROM Investment i LEFT JOIN FETCH i.account WHERE i.user.id = :userId")
     List<Investment> findByUserId(UUID userId);
 
     List<Investment> findByUserIdAndType(UUID userId, Investment.InvestmentType type);

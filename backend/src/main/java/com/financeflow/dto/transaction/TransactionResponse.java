@@ -36,6 +36,9 @@ public class TransactionResponse {
     private CategoryInfo category;
     private Set<TagInfo> tags;
     private List<SplitInfo> splits;
+    private UUID installmentGroupId;
+    private Integer installmentIndex;
+    private Integer installmentTotal;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

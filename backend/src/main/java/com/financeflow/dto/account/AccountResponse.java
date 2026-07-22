@@ -32,6 +32,9 @@ public class AccountResponse implements Serializable {
     private String bankName;
     private String accountNumber;
     private boolean active;
+    private BigDecimal creditLimit;
+    private Integer closingDay;
+    private Integer dueDay;
     private BigDecimal goalBalance;
     private Double goalProgress;
     private LocalDateTime createdAt;

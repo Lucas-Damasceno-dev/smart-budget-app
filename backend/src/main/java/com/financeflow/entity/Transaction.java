@@ -42,12 +42,14 @@ public class Transaction {
     private Category.TransactionType type;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private TransactionStatus status = TransactionStatus.COMPLETED;
 
     private String notes;
 
     private String receiptUrl;
 
+    @Builder.Default
     private boolean isRecurring = false;
 
     @Enumerated(EnumType.STRING)
@@ -87,6 +89,13 @@ public class Transaction {
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<TransactionSplit> splits = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "installment_group_id")
+    private InstallmentGroup installmentGroup;
+
+    @Column(name = "installment_index")
+    private Integer installmentIndex;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

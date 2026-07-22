@@ -35,8 +35,10 @@ public class Category {
 
     private String icon;
 
+    @Builder.Default
     private boolean active = true;
 
+    @Builder.Default
     private boolean isDefault = false;
 
     @Column(precision = 19, scale = 4)

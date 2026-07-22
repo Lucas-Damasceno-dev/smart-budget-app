@@ -26,11 +26,13 @@ public class DataInitializer {
             String demoPassword = "Demo@123";
             
             userRepository.findByEmail(demoEmail).ifPresent(user -> {
-                // Update password to ensure it matches the expected value
                 String encodedPassword = passwordEncoder.encode(demoPassword);
                 user.setPassword(encodedPassword);
+                if (user.getRole() == null) user.setRole(User.Role.USER);
+                if (user.getProfileType() == null) user.setProfileType(User.ProfileType.INDIVIDUAL);
+                user.setEnabled(true);
                 userRepository.save(user);
-                log.info("Demo user password updated successfully");
+                log.info("Demo user password and credentials initialized successfully");
             });
         };
     }

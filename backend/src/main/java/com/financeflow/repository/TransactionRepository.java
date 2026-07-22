@@ -38,11 +38,40 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
     @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.category.id = :categoryId AND t.date BETWEEN :startDate AND :endDate")
     BigDecimal sumByCategoryIdAndDateBetween(UUID categoryId, LocalDate startDate, LocalDate endDate);
 
+    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.user.id = :userId AND t.category.id = :categoryId AND t.date BETWEEN :startDate AND :endDate")
+    BigDecimal sumByUserIdAndCategoryAndDateBetween(UUID userId, UUID categoryId, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId AND t.category.id = :categoryId AND t.date BETWEEN :startDate AND :endDate ORDER BY t.date DESC")
+    List<Transaction> findByUserIdAndCategoryIdAndDateBetween(UUID userId, UUID categoryId, LocalDate startDate, LocalDate endDate);
+
     List<Transaction> findByIsRecurringTrueAndRecurrenceEndDateGreaterThanEqual(LocalDate date);
 
     @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId AND t.isRecurring = true")
     List<Transaction> findRecurringByUserId(UUID userId);
 
+    @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId AND t.isRecurring = true")
+    List<Transaction> findByUserIdAndIsRecurringTrue(UUID userId);
+
     @Query("SELECT COUNT(t) FROM Transaction t WHERE t.user.id = :userId AND t.date BETWEEN :startDate AND :endDate")
     long countByUserIdAndDateBetween(UUID userId, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT t FROM Transaction t WHERE t.status = 'PENDING' AND t.date <= :date")
+    List<Transaction> findPendingTransactionsDueBefore(LocalDate date);
+
+    @Query("SELECT t FROM Transaction t WHERE t.account.id = :accountId AND t.date BETWEEN :start AND :end " +
+           "AND t.type = :type AND t.status = :status " +
+           "ORDER BY t.date ASC")
+    List<Transaction> findByAccountIdAndDateBetweenAndTypeAndStatus(
+        UUID accountId, LocalDate start, LocalDate end,
+        com.financeflow.entity.Category.TransactionType type,
+        com.financeflow.entity.Transaction.TransactionStatus status);
+
+    List<Transaction> findByInstallmentGroupIdAndStatus(UUID groupId, Transaction.TransactionStatus status);
+
+    List<Transaction> findByInstallmentGroupIdOrderByInstallmentIndexAsc(UUID groupId);
+
+    @Query("SELECT t FROM Transaction t WHERE t.destinationAccount.id = :accountId " +
+           "AND t.date BETWEEN :start AND :end AND t.type = :type")
+    List<Transaction> findByDestinationAccountIdAndDateBetweenAndType(
+        UUID accountId, LocalDate start, LocalDate end, Category.TransactionType type);
 }

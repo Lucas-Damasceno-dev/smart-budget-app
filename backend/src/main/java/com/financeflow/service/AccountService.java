@@ -60,6 +60,9 @@ public class AccountService {
                 .icon(request.getIcon())
                 .bankName(request.getBankName())
                 .accountNumber(request.getAccountNumber())
+                .creditLimit(request.getCreditLimit())
+                .closingDay(request.getClosingDay())
+                .dueDay(request.getDueDay())
                 .goalBalance(request.getGoalBalance())
                 .user(user)
                 .active(true)
@@ -81,6 +84,9 @@ public class AccountService {
         account.setIcon(request.getIcon());
         account.setBankName(request.getBankName());
         account.setAccountNumber(request.getAccountNumber());
+        if (request.getCreditLimit() != null) account.setCreditLimit(request.getCreditLimit());
+        if (request.getClosingDay() != null) account.setClosingDay(request.getClosingDay());
+        if (request.getDueDay() != null) account.setDueDay(request.getDueDay());
         account.setGoalBalance(request.getGoalBalance());
 
         account = accountRepository.save(account);
@@ -110,9 +116,10 @@ public class AccountService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
+        BigDecimal current = account.getCurrentBalance() != null ? account.getCurrentBalance() : BigDecimal.ZERO;
         BigDecimal newBalance = isCredit
-                ? account.getCurrentBalance().add(amount)
-                : account.getCurrentBalance().subtract(amount);
+                ? current.add(amount)
+                : current.subtract(amount);
 
         account.setCurrentBalance(newBalance);
         
@@ -156,6 +163,9 @@ public class AccountService {
                 .bankName(account.getBankName())
                 .accountNumber(account.getAccountNumber())
                 .active(account.isActive())
+                .creditLimit(account.getCreditLimit())
+                .closingDay(account.getClosingDay())
+                .dueDay(account.getDueDay())
                 .goalBalance(account.getGoalBalance())
                 .goalProgress(goalProgress)
                 .createdAt(account.getCreatedAt())

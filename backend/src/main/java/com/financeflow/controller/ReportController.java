@@ -66,4 +66,18 @@ public class ReportController {
         ReportResponse report = reportService.generateReport(userId, startDate, endDate);
         return ResponseEntity.ok(ApiResponse.success(report));
     }
+
+    @GetMapping("/export/csv")
+    @Operation(summary = "Export report as CSV")
+    public ResponseEntity<byte[]> exportCsv(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        UUID userId = securityUtils.getCurrentUserId();
+        byte[] csvData = reportService.generateCsvReport(userId, startDate, endDate);
+
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"financeflow-report.csv\"")
+                .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8")
+                .body(csvData);
+    }
 }

@@ -27,6 +27,7 @@ public class Budget {
     private BigDecimal limitAmount;
 
     @Column(precision = 19, scale = 4)
+    @Builder.Default
     private BigDecimal spentAmount = BigDecimal.ZERO;
 
     private int month;
@@ -34,9 +35,11 @@ public class Budget {
     private int year;
 
     @Column(name = "alert_at80_sent")
+    @Builder.Default
     private boolean alertAt80Sent = false;
 
     @Column(name = "alert_at100_sent")
+    @Builder.Default
     private boolean alertAt100Sent = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,12 +57,14 @@ public class Budget {
     private LocalDateTime updatedAt;
 
     public BigDecimal getRemainingAmount() {
-        return limitAmount.subtract(spentAmount);
+        BigDecimal spent = spentAmount != null ? spentAmount : BigDecimal.ZERO;
+        return limitAmount != null ? limitAmount.subtract(spent) : BigDecimal.ZERO;
     }
 
     public double getPercentageUsed() {
-        if (limitAmount.compareTo(BigDecimal.ZERO) == 0) return 0;
-        return spentAmount.divide(limitAmount, 4, java.math.RoundingMode.HALF_UP)
+        BigDecimal spent = spentAmount != null ? spentAmount : BigDecimal.ZERO;
+        if (limitAmount == null || limitAmount.compareTo(BigDecimal.ZERO) == 0) return 0;
+        return spent.divide(limitAmount, 4, java.math.RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100)).doubleValue();
     }
 }

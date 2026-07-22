@@ -33,6 +33,7 @@ public class TransactionRequest {
     @NotNull(message = "Transaction type is required")
     private Category.TransactionType type;
 
+    @Builder.Default
     private Transaction.TransactionStatus status = Transaction.TransactionStatus.COMPLETED;
 
     private String notes;
@@ -47,6 +48,7 @@ public class TransactionRequest {
 
     private Set<String> tags;
 
+    @Builder.Default
     private boolean isRecurring = false;
 
     private Transaction.RecurrenceFrequency recurrenceFrequency;

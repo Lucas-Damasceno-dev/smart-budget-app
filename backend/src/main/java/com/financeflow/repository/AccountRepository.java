@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -23,4 +24,6 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     List<Account> findByUserIdAndType(UUID userId, Account.AccountType type);
 
     boolean existsByIdAndUserId(UUID id, UUID userId);
+
+    Optional<Account> findByIdAndUserId(UUID id, UUID userId);
 }

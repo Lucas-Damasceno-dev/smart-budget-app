@@ -3,7 +3,10 @@ package com.financeflow.controller;
 import com.financeflow.dto.account.AccountRequest;
 import com.financeflow.dto.account.AccountResponse;
 import com.financeflow.dto.common.ApiResponse;
+import com.financeflow.dto.transaction.TransactionResponse;
 import com.financeflow.service.AccountService;
+import com.financeflow.service.InvoiceService;
+import com.financeflow.service.TransactionService;
 import com.financeflow.util.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -26,6 +31,8 @@ import java.util.UUID;
 public class AccountController {
 
     private final AccountService accountService;
+    private final InvoiceService invoiceService;
+    private final TransactionService transactionService;
     private final SecurityUtils securityUtils;
 
     @GetMapping
@@ -85,5 +92,37 @@ public class AccountController {
         UUID userId = securityUtils.getCurrentUserId();
         accountService.deleteAccount(id, userId);
         return ResponseEntity.ok(ApiResponse.success(null, "Account deleted successfully"));
+    }
+
+    @GetMapping("/{id}/invoice")
+    @Operation(summary = "Get invoice for a credit card account")
+    public ResponseEntity<ApiResponse<InvoiceService.InvoiceData>> getInvoice(
+            @PathVariable UUID id,
+            @RequestParam(required = false) String month) {
+        UUID userId = securityUtils.getCurrentUserId();
+        InvoiceService.InvoiceData invoice;
+        if (month != null) {
+            LocalDate refDate = LocalDate.parse(month + "-01");
+            invoice = invoiceService.getInvoiceForMonth(id, userId, refDate);
+        } else {
+            invoice = invoiceService.getCurrentInvoice(id, userId);
+        }
+        return ResponseEntity.ok(ApiResponse.success(invoice));
+    }
+
+    @PostMapping("/{id}/invoice/pay")
+    @Operation(summary = "Pay invoice for a credit card account")
+    public ResponseEntity<ApiResponse<TransactionResponse>> payInvoice(
+            @PathVariable UUID id,
+            @RequestBody Map<String, UUID> body) {
+        UUID userId = securityUtils.getCurrentUserId();
+        UUID sourceAccountId = body.get("sourceAccountId");
+        if (sourceAccountId == null) {
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error("sourceAccountId is required"));
+        }
+        var payment = invoiceService.payInvoice(id, sourceAccountId, userId);
+        TransactionResponse response = transactionService.toResponse(payment);
+        return ResponseEntity.ok(ApiResponse.success(response, "Invoice paid"));
     }
 }

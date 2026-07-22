@@ -30,6 +30,7 @@ public class Notification {
     @Column(nullable = false)
     private NotificationType type;
 
+    @Builder.Default
     private boolean read = false;
 
     private String actionUrl;

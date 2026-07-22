@@ -33,11 +33,14 @@ public class Account {
     private AccountType type;
 
     @Column(nullable = false, precision = 19, scale = 4)
+    @Builder.Default
     private BigDecimal initialBalance = BigDecimal.ZERO;
 
     @Column(nullable = false, precision = 19, scale = 4)
+    @Builder.Default
     private BigDecimal currentBalance = BigDecimal.ZERO;
 
+    @Builder.Default
     private String currency = "BRL";
 
     private String color;
@@ -48,7 +51,17 @@ public class Account {
 
     private String accountNumber;
 
+    @Builder.Default
     private boolean active = true;
+
+    @Column(name = "credit_limit", precision = 19, scale = 4)
+    private BigDecimal creditLimit;
+
+    @Column(name = "closing_day")
+    private Integer closingDay;
+
+    @Column(name = "due_day")
+    private Integer dueDay;
 
     @Column(precision = 19, scale = 4)
     private BigDecimal goalBalance;

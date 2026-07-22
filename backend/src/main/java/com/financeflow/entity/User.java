@@ -39,16 +39,21 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Role role = Role.USER;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private ProfileType profileType = ProfileType.INDIVIDUAL;
 
+    @Builder.Default
     private boolean enabled = true;
 
+    @Builder.Default
     private boolean emailVerified = false;
 
+    @Builder.Default
     private boolean twoFactorEnabled = false;
 
     private String twoFactorSecret;

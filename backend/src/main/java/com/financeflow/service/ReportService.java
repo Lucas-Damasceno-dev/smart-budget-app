@@ -202,4 +202,24 @@ public class ReportService {
                 .paretoAnalysis(paretoAnalysis)
                 .build();
     }
+
+    public byte[] generateCsvReport(UUID userId, LocalDate startDate, LocalDate endDate) {
+        List<Transaction> transactions = transactionRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+        StringBuilder csv = new StringBuilder();
+        csv.append("Data,Descrição,Tipo,Valor,Categoria,Conta,Notas\n");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        for (Transaction t : transactions) {
+            csv.append(String.format("%s,\"%s\",%s,%.2f,\"%s\",\"%s\",\"%s\"\n",
+                    t.getDate().format(formatter),
+                    t.getDescription().replace("\"", "\"\""),
+                    t.getType(),
+                    t.getAmount(),
+                    t.getCategory() != null ? t.getCategory().getName().replace("\"", "\"\"") : "",
+                    t.getAccount() != null ? t.getAccount().getName().replace("\"", "\"\"") : "",
+                    t.getNotes() != null ? t.getNotes().replace("\"", "\"\"") : ""
+            ));
+        }
+        return csv.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    }
 }

@@ -161,8 +161,12 @@ public class TransactionService {
     public TransactionResponse updateTransaction(UUID transactionId, TransactionRequest request, UUID userId) {
         Transaction transaction = findTransactionByIdAndUser(transactionId, userId);
 
-        // Reverse old balance update
+        // Reverse old balance and budget update
         reverseAccountBalance(transaction);
+        if (transaction.getType() == Category.TransactionType.EXPENSE) {
+            budgetService.reverseBudgetSpending(
+                    transaction.getCategory().getId(), userId, transaction.getAmount(), transaction.getDate());
+        }
 
         // Update fields
         transaction.setDescription(request.getDescription());
@@ -193,8 +197,11 @@ public class TransactionService {
 
         transaction = transactionRepository.save(transaction);
 
-        // Apply new balance update
+        // Apply new balance and budget update
         updateAccountBalance(transaction);
+        if (request.getType() == Category.TransactionType.EXPENSE) {
+            budgetService.updateBudgetSpending(category.getId(), userId, request.getAmount(), request.getDate());
+        }
 
         return mapToResponse(transaction);
     }
@@ -207,8 +214,12 @@ public class TransactionService {
     public void deleteTransaction(UUID transactionId, UUID userId) {
         Transaction transaction = findTransactionByIdAndUser(transactionId, userId);
         
-        // Reverse balance
+        // Reverse balance and budget
         reverseAccountBalance(transaction);
+        if (transaction.getType() == Category.TransactionType.EXPENSE) {
+            budgetService.reverseBudgetSpending(
+                    transaction.getCategory().getId(), userId, transaction.getAmount(), transaction.getDate());
+        }
 
         transactionRepository.delete(transaction);
     }
@@ -371,27 +382,31 @@ public class TransactionService {
                 .icon(transaction.getCategory().getIcon())
                 .build();
 
-        Set<TransactionResponse.TagInfo> tagInfos = transaction.getTags().stream()
-                .map(tag -> TransactionResponse.TagInfo.builder()
-                        .id(tag.getId())
-                        .name(tag.getName())
-                        .color(tag.getColor())
-                        .build())
-                .collect(Collectors.toSet());
-
-        List<TransactionResponse.SplitInfo> splitInfos = transaction.getSplits().stream()
-                .map(split -> TransactionResponse.SplitInfo.builder()
-                        .id(split.getId())
-                        .amount(split.getAmount())
-                        .description(split.getDescription())
-                        .category(TransactionResponse.CategoryInfo.builder()
-                                .id(split.getCategory().getId())
-                                .name(split.getCategory().getName())
-                                .color(split.getCategory().getColor())
-                                .icon(split.getCategory().getIcon())
+        Set<TransactionResponse.TagInfo> tagInfos = transaction.getTags() != null
+                ? transaction.getTags().stream()
+                        .map(tag -> TransactionResponse.TagInfo.builder()
+                                .id(tag.getId())
+                                .name(tag.getName())
+                                .color(tag.getColor())
                                 .build())
-                        .build())
-                .collect(Collectors.toList());
+                        .collect(Collectors.toSet())
+                : Collections.emptySet();
+
+        List<TransactionResponse.SplitInfo> splitInfos = transaction.getSplits() != null
+                ? transaction.getSplits().stream()
+                        .map(split -> TransactionResponse.SplitInfo.builder()
+                                .id(split.getId())
+                                .amount(split.getAmount())
+                                .description(split.getDescription())
+                                .category(TransactionResponse.CategoryInfo.builder()
+                                        .id(split.getCategory().getId())
+                                        .name(split.getCategory().getName())
+                                        .color(split.getCategory().getColor())
+                                        .icon(split.getCategory().getIcon())
+                                        .build())
+                                .build())
+                        .collect(Collectors.toList())
+                : Collections.emptyList();
 
         return TransactionResponse.builder()
                 .id(transaction.getId())
@@ -410,8 +425,17 @@ public class TransactionService {
                 .category(categoryInfo)
                 .tags(tagInfos)
                 .splits(splitInfos)
+                .installmentGroupId(transaction.getInstallmentGroup() != null
+                    ? transaction.getInstallmentGroup().getId() : null)
+                .installmentIndex(transaction.getInstallmentIndex())
+                .installmentTotal(transaction.getInstallmentGroup() != null
+                    ? transaction.getInstallmentGroup().getTotalInstallments() : null)
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
                 .build();
+    }
+
+    public TransactionResponse toResponse(Transaction transaction) {
+        return mapToResponse(transaction);
     }
 }

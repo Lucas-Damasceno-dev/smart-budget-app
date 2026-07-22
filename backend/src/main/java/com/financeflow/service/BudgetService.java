@@ -61,12 +61,17 @@ public class BudgetService {
 
     @Transactional
     public void updateBudgetSpending(UUID categoryId, UUID userId, BigDecimal amount, LocalDate transactionDate) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+
         Optional<Budget> budgetOpt = budgetRepository.findByCategoryIdAndMonthAndYear(
                 categoryId, transactionDate.getMonthValue(), transactionDate.getYear());
 
         if (budgetOpt.isPresent()) {
             Budget budget = budgetOpt.get();
-            budget.setSpentAmount(budget.getSpentAmount().add(amount));
+            BigDecimal currentSpent = budget.getSpentAmount() != null ? budget.getSpentAmount() : BigDecimal.ZERO;
+            budget.setSpentAmount(currentSpent.add(amount));
             budgetRepository.save(budget);
 
             // Check for alerts
@@ -91,6 +96,27 @@ public class BudgetService {
                 budget.setAlertAt80Sent(true);
                 budgetRepository.save(budget);
             }
+        }
+    }
+
+    @Transactional
+    public void reverseBudgetSpending(UUID categoryId, UUID userId, BigDecimal amount, LocalDate transactionDate) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+
+        Optional<Budget> budgetOpt = budgetRepository.findByCategoryIdAndMonthAndYear(
+                categoryId, transactionDate.getMonthValue(), transactionDate.getYear());
+
+        if (budgetOpt.isPresent()) {
+            Budget budget = budgetOpt.get();
+            BigDecimal currentSpent = budget.getSpentAmount() != null ? budget.getSpentAmount() : BigDecimal.ZERO;
+            BigDecimal newSpent = currentSpent.subtract(amount);
+            if (newSpent.compareTo(BigDecimal.ZERO) < 0) {
+                newSpent = BigDecimal.ZERO;
+            }
+            budget.setSpentAmount(newSpent);
+            budgetRepository.save(budget);
         }
     }
 

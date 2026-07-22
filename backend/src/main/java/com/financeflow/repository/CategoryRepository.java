@@ -21,8 +21,13 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
     @Query("SELECT c FROM Category c WHERE c.user.id = :userId AND c.parent IS NULL AND c.active = true")
     List<Category> findRootCategoriesByUserId(UUID userId);
 
+    @Query("SELECT c FROM Category c WHERE c.parent.id = :parentId")
+    List<Category> findByParentCategoryId(UUID parentId);
+
     @Query("SELECT c FROM Category c LEFT JOIN FETCH c.subcategories WHERE c.id = :id")
     Optional<Category> findByIdWithSubcategories(UUID id);
 
     boolean existsByIdAndUserId(UUID id, UUID userId);
+
+    Optional<Category> findByUserIdAndNameAndType(UUID userId, String name, Category.TransactionType type);
 }
