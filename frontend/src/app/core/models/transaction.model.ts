@@ -9,6 +9,9 @@ export interface Transaction {
   receiptUrl?: string;
   isRecurring: boolean;
   recurrenceFrequency?: RecurrenceFrequency;
+  installmentGroupId?: string;
+  installmentIndex?: number;
+  installmentTotal?: number;
   recurrenceEndDate?: string;
   account: AccountInfo;
   destinationAccount?: AccountInfo;

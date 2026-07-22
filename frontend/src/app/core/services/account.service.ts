@@ -16,6 +16,10 @@ export class AccountService {
     return this.http.get<ApiResponse<Account[]>>(this.apiUrl);
   }
 
+  list(): Observable<ApiResponse<Account[]>> {
+    return this.http.get<ApiResponse<Account[]>>(this.apiUrl);
+  }
+
   getAccount(id: string): Observable<ApiResponse<Account>> {
     return this.http.get<ApiResponse<Account>>(`${this.apiUrl}/${id}`);
   }

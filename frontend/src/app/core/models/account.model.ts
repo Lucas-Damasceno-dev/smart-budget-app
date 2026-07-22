@@ -12,6 +12,9 @@ export interface Account {
   active: boolean;
   goalBalance?: number;
   goalProgress?: number;
+  creditLimit?: number;
+  closingDay?: number;
+  dueDay?: number;
   createdAt: string;
   updatedAt: string;
 }

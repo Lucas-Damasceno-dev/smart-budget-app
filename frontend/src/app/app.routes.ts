@@ -47,11 +47,71 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'investments',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/investments/investments.component').then(
+        (m) => m.InvestmentsComponent
+      ),
+  },
+  {
+    path: 'goals',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/goals/goals.component').then(
+        (m) => m.GoalsComponent
+      ),
+  },
+  {
+    path: 'installments',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/installments/installments.routes').then(
+        (m) => m.INSTALLMENT_ROUTES
+      ),
+  },
+  {
+    path: 'subscriptions',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/subscriptions/subscriptions.routes').then(
+        (m) => m.SUBSCRIPTION_ROUTES
+      ),
+  },
+  {
+    path: 'invoices',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/invoices/invoices.routes').then(
+        (m) => m.INVOICE_ROUTES
+      ),
+  },
+  {
     path: 'settings',
     canActivate: [authGuard],
     loadChildren: () =>
       import('./features/settings/settings.routes').then(
         (m) => m.SETTINGS_ROUTES
+      ),
+  },
+  {
+    path: 'automation-rules',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/automation-rules/automation-rules.routes'),
+  },
+  {
+    path: 'imports',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/imports/imports.routes'),
+  },
+  {
+    path: 'shared-accounts',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/shared-accounts/shared-accounts.component').then(
+        (m) => m.SharedAccountsComponent
       ),
   },
   {

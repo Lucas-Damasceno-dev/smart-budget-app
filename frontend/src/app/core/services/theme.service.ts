@@ -11,6 +11,11 @@ export class ThemeService {
 
   isDarkTheme$ = this.isDarkThemeSubject.asObservable();
 
+  constructor() {
+    // Apply initial theme on body so dark-theme CSS class is active from load
+    this.applyTheme(this.isDarkThemeSubject.value);
+  }
+
   toggleTheme(): void {
     const newValue = !this.isDarkThemeSubject.value;
     this.isDarkThemeSubject.next(newValue);

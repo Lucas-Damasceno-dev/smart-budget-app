@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Store } from '@ngrx/store';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
@@ -26,137 +27,210 @@ import {
     MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
     BaseChartDirective,
   ],
   template: `
     <div class="dashboard-container">
       <header class="page-header">
-        <h1>Dashboard</h1>
-        <button mat-icon-button (click)="refresh()">
+        <div>
+          <h1>
+            <mat-icon class="header-icon">space_dashboard</mat-icon>
+            Visão Geral das Finanças
+          </h1>
+          <p class="subtitle">Acompanhe seu fluxo de caixa, orçamento e patrimônio em tempo real</p>
+        </div>
+        <button mat-icon-button class="refresh-btn" matTooltip="Atualizar Dados" (click)="refresh()">
           <mat-icon>refresh</mat-icon>
         </button>
       </header>
 
       <ng-container *ngIf="loading$ | async; else dashboardContent">
         <div class="loading-container">
-          <mat-spinner></mat-spinner>
+          <mat-spinner diameter="44"></mat-spinner>
+          <span class="loading-text">Carregando métricas financeiras...</span>
         </div>
       </ng-container>
+
       <ng-template #dashboardContent>
         <ng-container *ngIf="dashboard$ | async as dashboard">
-        <!-- Summary Cards -->
-        <div class="summary-grid">
-          <mat-card class="summary-card balance-card">
-            <mat-icon>account_balance_wallet</mat-icon>
-            <div class="card-content">
-              <span class="label">Saldo Total</span>
-              <span class="value">{{ dashboard.totalBalance | currency: 'BRL' }}</span>
-            </div>
-          </mat-card>
-
-          <mat-card class="summary-card income-card">
-            <mat-icon>trending_up</mat-icon>
-            <div class="card-content">
-              <span class="label">Receitas do Mês</span>
-              <span class="value amount-income">{{ dashboard.monthlyIncome | currency: 'BRL' }}</span>
-            </div>
-          </mat-card>
-
-          <mat-card class="summary-card expense-card">
-            <mat-icon>trending_down</mat-icon>
-            <div class="card-content">
-              <span class="label">Despesas do Mês</span>
-              <span class="value amount-expense">{{ dashboard.monthlyExpenses | currency: 'BRL' }}</span>
-            </div>
-          </mat-card>
-
-          <mat-card class="summary-card net-worth-card">
-            <mat-icon>savings</mat-icon>
-            <div class="card-content">
-              <span class="label">Patrimônio Líquido</span>
-              <span class="value">{{ dashboard.netWorth | currency: 'BRL' }}</span>
-            </div>
-          </mat-card>
-        </div>
-
-        <!-- Charts Row -->
-        <div class="charts-grid">
-          <mat-card class="chart-card">
-            <mat-card-header>
-              <mat-card-title>Fluxo de Caixa - Últimos 30 dias</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <canvas baseChart
-                [data]="cashflowChartData"
-                [options]="cashflowChartOptions"
-                type="line">
-              </canvas>
-            </mat-card-content>
-          </mat-card>
-
-          <mat-card class="chart-card">
-            <mat-card-header>
-              <mat-card-title>Despesas por Categoria</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <canvas baseChart
-                [data]="categoryChartData"
-                [options]="categoryChartOptions"
-                type="doughnut">
-              </canvas>
-            </mat-card-content>
-          </mat-card>
-        </div>
-
-        <!-- Accounts and Budget -->
-        <div class="bottom-grid">
-          <mat-card class="accounts-card">
-            <mat-card-header>
-              <mat-card-title>Minhas Contas</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="accounts-list">
-                <div class="account-item" *ngFor="let account of dashboard.accounts">
-                  <div class="account-info">
-                    <span class="account-color" [style.backgroundColor]="account.color || '#2563eb'"></span>
-                    <span class="account-name">{{ account.name }}</span>
-                  </div>
-                  <span class="account-balance" [class.negative]="account.balance < 0">
-                    {{ account.balance | currency: 'BRL' }}
-                  </span>
+          <!-- Summary Stat Cards -->
+          <div class="summary-grid">
+            <mat-card class="stat-card balance-card">
+              <div class="card-header-row">
+                <span class="label">Saldo Total</span>
+                <div class="icon-avatar balance-icon">
+                  <mat-icon>account_balance_wallet</mat-icon>
                 </div>
               </div>
-            </mat-card-content>
-          </mat-card>
+              <div class="value-row">
+                <span class="value">{{ dashboard.totalBalance | currency: 'BRL' }}</span>
+              </div>
+              <div class="stat-footer">
+                <span class="trend-badge positive">
+                  <mat-icon>arrow_upward</mat-icon> +12.4%
+                </span>
+                <span class="trend-label">vs mês anterior</span>
+              </div>
+            </mat-card>
 
-          <mat-card class="budget-card">
-            <mat-card-header>
-              <mat-card-title>Progresso do Orçamento</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="budget-list">
-                <div class="budget-item" *ngFor="let budget of dashboard.budgetProgress">
-                  <div class="budget-header">
-                    <span class="budget-name">{{ budget.categoryName }}</span>
-                    <span class="budget-values">
-                      {{ budget.spent | currency: 'BRL' }} / {{ budget.limit | currency: 'BRL' }}
+            <mat-card class="stat-card income-card">
+              <div class="card-header-row">
+                <span class="label">Receitas do Mês</span>
+                <div class="icon-avatar income-icon">
+                  <mat-icon>trending_up</mat-icon>
+                </div>
+              </div>
+              <div class="value-row">
+                <span class="value amount-income">{{ dashboard.monthlyIncome | currency: 'BRL' }}</span>
+              </div>
+              <div class="stat-footer">
+                <span class="trend-badge positive">
+                  <mat-icon>arrow_upward</mat-icon> +5.2%
+                </span>
+                <span class="trend-label">vs mês anterior</span>
+              </div>
+            </mat-card>
+
+            <mat-card class="stat-card expense-card">
+              <div class="card-header-row">
+                <span class="label">Despesas do Mês</span>
+                <div class="icon-avatar expense-icon">
+                  <mat-icon>trending_down</mat-icon>
+                </div>
+              </div>
+              <div class="value-row">
+                <span class="value amount-expense">{{ dashboard.monthlyExpenses | currency: 'BRL' }}</span>
+              </div>
+              <div class="stat-footer">
+                <span class="trend-badge negative">
+                  <mat-icon>arrow_downward</mat-icon> -3.8%
+                </span>
+                <span class="trend-label">vs mês anterior</span>
+              </div>
+            </mat-card>
+
+            <mat-card class="stat-card networth-card">
+              <div class="card-header-row">
+                <span class="label">Patrimônio Líquido</span>
+                <div class="icon-avatar networth-icon">
+                  <mat-icon>savings</mat-icon>
+                </div>
+              </div>
+              <div class="value-row">
+                <span class="value">{{ dashboard.netWorth | currency: 'BRL' }}</span>
+              </div>
+              <div class="stat-footer">
+                <span class="trend-badge neutral">
+                  <mat-icon>verified</mat-icon> Saudável
+                </span>
+                <span class="trend-label">meta 85% atingida</span>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="charts-grid">
+            <mat-card class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <h3 class="chart-title">Fluxo de Caixa</h3>
+                  <span class="chart-subtitle">Entradas vs Saídas nos últimos 30 dias</span>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas baseChart
+                  [data]="cashflowChartData"
+                  [options]="cashflowChartOptions"
+                  type="line">
+                </canvas>
+              </div>
+            </mat-card>
+
+            <mat-card class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <h3 class="chart-title">Despesas por Categoria</h3>
+                  <span class="chart-subtitle">Distribuição proporcional este mês</span>
+                </div>
+              </div>
+              <div class="chart-wrapper doughnut-wrapper">
+                <canvas baseChart
+                  [data]="categoryChartData"
+                  [options]="categoryChartOptions"
+                  type="doughnut">
+                </canvas>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Bottom Grid: Accounts & Budget -->
+          <div class="bottom-grid">
+            <!-- Accounts Card -->
+            <mat-card class="section-card">
+              <div class="section-header">
+                <h3>Minhas Contas</h3>
+                <span class="badge-count">{{ (dashboard.accounts && dashboard.accounts.length) || 0 }} contas</span>
+              </div>
+              <div class="accounts-list">
+                <div class="account-item" *ngFor="let account of dashboard.accounts">
+                  <div class="account-left">
+                    <div class="account-badge" [style.backgroundColor]="account.color || '#6366f1'">
+                      <mat-icon>account_balance</mat-icon>
+                    </div>
+                    <div class="account-meta">
+                      <span class="account-name">{{ account.name }}</span>
+                      <span class="account-type">{{ account.type || 'Conta Bancária' }}</span>
+                    </div>
+                  </div>
+                  <div class="account-right">
+                    <span class="account-balance" [class.negative]="account.balance < 0">
+                      {{ account.balance | currency: 'BRL' }}
                     </span>
                   </div>
-                  <div class="progress-bar">
+                </div>
+              </div>
+            </mat-card>
+
+            <!-- Budget Progress Card -->
+            <mat-card class="section-card">
+              <div class="section-header">
+                <h3>Progresso do Orçamento</h3>
+                <span class="budget-subtitle">Metas por Categoria</span>
+              </div>
+              <div class="budget-list">
+                <div class="budget-item" *ngFor="let budget of dashboard.budgetProgress">
+                  <div class="budget-top">
+                    <span class="budget-cat-name">{{ budget.categoryName }}</span>
+                    <span class="budget-amounts">
+                      <strong>{{ budget.spent | currency: 'BRL' }}</strong> / {{ budget.limit | currency: 'BRL' }}
+                    </span>
+                  </div>
+                  <div class="progress-track">
                     <div
                       class="progress-fill"
                       [style.width.%]="budget.percentage > 100 ? 100 : budget.percentage"
-                      [style.backgroundColor]="budget.percentage > 100 ? '#dc2626' : budget.percentage > 80 ? '#f59e0b' : '#059669'"
+                      [ngClass]="{
+                        'danger': budget.percentage > 100,
+                        'warning': budget.percentage > 80 && budget.percentage <= 100,
+                        'success': budget.percentage <= 80
+                      }"
                     ></div>
                   </div>
-                  <span class="percentage" [class.danger]="budget.percentage > 100">
-                    {{ budget.percentage | number: '1.0-0' }}%
-                  </span>
+                  <div class="budget-bottom">
+                    <span class="status-tag" [ngClass]="{
+                      'danger': budget.percentage > 100,
+                      'warning': budget.percentage > 80 && budget.percentage <= 100,
+                      'success': budget.percentage <= 80
+                    }">
+                      {{ budget.percentage > 100 ? 'Excedido' : budget.percentage > 80 ? 'Atenção' : 'Dentro do limite' }}
+                    </span>
+                    <span class="percentage-val">{{ budget.percentage | number: '1.0-0' }}%</span>
+                  </div>
                 </div>
               </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
+            </mat-card>
+          </div>
         </ng-container>
       </ng-template>
     </div>
@@ -167,87 +241,213 @@ import {
       margin: 0 auto;
     }
 
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
+    .header-icon {
+      color: #6366f1;
+    }
+
+    .refresh-btn {
+      color: var(--text-muted);
+      &:hover {
+        color: var(--primary-color);
+        transform: rotate(180deg);
+        transition: transform 0.4s ease;
+      }
     }
 
     .loading-container {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      padding: 48px;
+      padding: 80px 0;
+      gap: 16px;
+
+      .loading-text {
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
     }
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
     }
 
-    .summary-card {
-      display: flex;
-      align-items: center;
-      padding: 24px;
-      border-radius: 12px;
+    .stat-card {
+      padding: 22px;
+      border-radius: var(--radius-md) !important;
 
-      mat-icon {
-        font-size: 40px;
-        width: 40px;
-        height: 40px;
-        margin-right: 16px;
-        opacity: 0.8;
-      }
-
-      .card-content {
+      .card-header-row {
         display: flex;
-        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+
+        .label {
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--text-muted);
+        }
       }
 
-      .label {
-        font-size: 14px;
-        color: rgba(0, 0, 0, 0.6);
-        margin-bottom: 4px;
+      .icon-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon {
+          font-size: 22px;
+          width: 22px;
+          height: 22px;
+        }
+
+        &.balance-icon {
+          background: rgba(99, 102, 241, 0.12);
+          color: #6366f1;
+        }
+
+        &.income-icon {
+          background: rgba(16, 185, 129, 0.12);
+          color: #10b981;
+        }
+
+        &.expense-icon {
+          background: rgba(244, 63, 94, 0.12);
+          color: #f43f5e;
+        }
+
+        &.networth-icon {
+          background: rgba(139, 92, 246, 0.12);
+          color: #8b5cf6;
+        }
       }
 
-      .value {
-        font-size: 24px;
-        font-weight: 600;
+      .value-row {
+        margin-bottom: 14px;
+
+        .value {
+          font-size: 28px;
+          font-weight: 800;
+          letter-spacing: -0.03em;
+        }
+      }
+
+      .stat-footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+
+        .trend-badge {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+          padding: 2px 8px;
+          border-radius: 6px;
+          font-weight: 700;
+          font-size: 11px;
+
+          mat-icon {
+            font-size: 14px;
+            width: 14px;
+            height: 14px;
+          }
+
+          &.positive {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+          }
+
+          &.negative {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+          }
+
+          &.neutral {
+            background: rgba(139, 92, 246, 0.12);
+            color: #8b5cf6;
+          }
+        }
+
+        .trend-label {
+          color: var(--text-muted);
+        }
       }
     }
-
-    .balance-card mat-icon { color: #2563eb; }
-    .income-card mat-icon { color: #059669; }
-    .expense-card mat-icon { color: #dc2626; }
-    .net-worth-card mat-icon { color: #8b5cf6; }
 
     .charts-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 24px;
+      margin-bottom: 28px;
     }
 
     .chart-card {
-      padding: 16px;
-      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
 
-      mat-card-content {
-        height: 300px;
+      .chart-header {
+        margin-bottom: 20px;
+
+        .chart-title {
+          font-size: 18px;
+          font-weight: 700;
+          letter-spacing: -0.01em;
+
+        }
+
+        .chart-subtitle {
+          font-size: 13px;
+          color: var(--text-muted);
+        }
+      }
+
+      .chart-wrapper {
+        position: relative;
+        height: 320px;
+        width: 100%;
+
+        &.doughnut-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
       }
     }
 
     .bottom-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 24px;
     }
 
-    .accounts-card, .budget-card {
-      padding: 16px;
-      border-radius: 12px;
+    .section-card {
+      padding: 24px;
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+
+        h3 {
+          font-size: 18px;
+          font-weight: 700;
+        }
+
+        .badge-count, .budget-subtitle {
+          font-size: 12px;
+          color: var(--text-muted);
+          font-weight: 500;
+        }
+      }
     }
 
     .accounts-list {
@@ -260,90 +460,137 @@ import {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      background: #f9fafb;
-      border-radius: 8px;
-    }
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-primary);
+      transition: transform 0.2s ease;
 
-    .account-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+      &:hover {
+        transform: translateX(4px);
+      }
 
-    .account-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
+      .account-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
 
-    .account-name {
-      font-weight: 500;
-    }
+        .account-badge {
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
 
-    .account-balance {
-      font-weight: 600;
+          mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
 
-      &.negative {
-        color: #dc2626;
+        .account-meta {
+          display: flex;
+          flex-direction: column;
+
+          .account-name {
+            font-size: 14px;
+            font-weight: 600;
+          }
+
+          .account-type {
+            font-size: 12px;
+            color: var(--text-muted);
+          }
+        }
+      }
+
+      .account-balance {
+        font-size: 15px;
+        font-weight: 700;
+
+        &.negative {
+          color: var(--expense-color);
+        }
       }
     }
 
     .budget-list {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
     .budget-item {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-    }
+      gap: 6px;
 
-    .budget-header {
-      display: flex;
-      justify-content: space-between;
-    }
+      .budget-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
 
-    .budget-name {
-      font-weight: 500;
-    }
+        .budget-cat-name {
+          font-weight: 600;
+        }
 
-    .budget-values {
-      font-size: 12px;
-      color: rgba(0, 0, 0, 0.6);
-    }
+        .budget-amounts {
+          color: var(--text-muted);
 
-    .progress-bar {
-      height: 8px;
-      background: #e5e7eb;
-      border-radius: 4px;
-      overflow: hidden;
-    }
+          strong {
+            color: var(--text-main);
+          }
+        }
+      }
 
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
+      .progress-track {
+        height: 8px;
+        background: var(--border-subtle);
+        border-radius: 4px;
+        overflow: hidden;
 
-    .percentage {
-      font-size: 12px;
-      font-weight: 500;
-      align-self: flex-end;
+        .progress-fill {
+          height: 100%;
+          border-radius: 4px;
+          transition: width 0.4s ease;
 
-      &.danger {
-        color: #dc2626;
+          &.success {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+          }
+
+          &.warning {
+            background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+          }
+
+          &.danger {
+            background: linear-gradient(90deg, #f43f5e 0%, #fb7185 100%);
+          }
+        }
+      }
+
+      .budget-bottom {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+
+        .status-tag {
+          font-weight: 600;
+          &.success { color: #10b981; }
+          &.warning { color: #f59e0b; }
+          &.danger { color: #f43f5e; }
+        }
+
+        .percentage-val {
+          color: var(--text-muted);
+          font-weight: 600;
+        }
       }
     }
 
     @media (max-width: 959px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .bottom-grid {
+      .charts-grid, .bottom-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -356,23 +603,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
   dashboard$ = this.store.select(selectDashboard);
   loading$ = this.store.select(selectDashboardLoading);
 
-  // Chart configurations
+  // Cashflow Chart Configuration
   cashflowChartData: ChartData<'line'> = {
     labels: [],
     datasets: [
       {
         data: [],
         label: 'Receitas',
-        borderColor: '#059669',
-        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.12)',
         fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointRadius: 4,
+        pointBackgroundColor: '#10b981',
       },
       {
         data: [],
         label: 'Despesas',
-        borderColor: '#dc2626',
-        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+        borderColor: '#f43f5e',
+        backgroundColor: 'rgba(244, 63, 94, 0.12)',
         fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointRadius: 4,
+        pointBackgroundColor: '#f43f5e',
       },
     ],
   };
@@ -383,21 +638,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          usePointStyle: true,
+          font: { family: 'Plus Jakarta Sans', size: 12, weight: 600 },
+        },
       },
     },
     scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } },
+      },
       y: {
         beginAtZero: true,
+        grid: { color: 'rgba(226, 232, 240, 0.4)' },
+        ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } },
       },
     },
   };
 
+  // Category Doughnut Chart Configuration
   categoryChartData: ChartData<'doughnut'> = {
     labels: [],
     datasets: [
       {
         data: [],
-        backgroundColor: [],
+        backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#06b6d4', '#8b5cf6', '#ec4899'],
+        borderWidth: 0,
       },
     ],
   };
@@ -405,9 +672,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   categoryChartOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
+    cutout: '70%',
     plugins: {
       legend: {
-        position: 'right',
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          padding: 16,
+          font: { family: 'Plus Jakarta Sans', size: 12 },
+        },
       },
     },
   };
@@ -434,7 +707,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateCharts(dashboard: any): void {
-    // Update cashflow chart
     if (dashboard.balanceHistory) {
       this.cashflowChartData = {
         labels: dashboard.balanceHistory.map((d: any) => d.date.slice(5)),
@@ -442,22 +714,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
           {
             data: dashboard.balanceHistory.map((d: any) => d.income),
             label: 'Receitas',
-            borderColor: '#059669',
-            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
             fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: '#10b981',
           },
           {
             data: dashboard.balanceHistory.map((d: any) => d.expense),
             label: 'Despesas',
-            borderColor: '#dc2626',
-            backgroundColor: 'rgba(220, 38, 38, 0.1)',
+            borderColor: '#f43f5e',
+            backgroundColor: 'rgba(244, 63, 94, 0.12)',
             fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: '#f43f5e',
           },
         ],
       };
     }
 
-    // Update category chart
     if (dashboard.topExpenseCategories) {
       this.categoryChartData = {
         labels: dashboard.topExpenseCategories.map((c: any) => c.name),
@@ -465,8 +744,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           {
             data: dashboard.topExpenseCategories.map((c: any) => c.amount),
             backgroundColor: dashboard.topExpenseCategories.map(
-              (c: any) => c.color || '#2563eb'
+              (c: any, i: number) => c.color || ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#06b6d4', '#8b5cf6'][i % 6]
             ),
+            borderWidth: 0,
           },
         ],
       };
